@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>ISS</title>
+  <!-- treliça central -->
+  <rect x="6" y="30" width="52" height="4" rx="1" fill="#cfd6e0" stroke="#0b1d3a" stroke-width="1"/>
+  <!-- painéis solares -->
+  <g fill="#1f5fbf" stroke="#0b1d3a" stroke-width="1">
+    <rect x="4" y="12" width="9" height="16" rx="1"/>
+    <rect x="15" y="12" width="9" height="16" rx="1"/>
+    <rect x="40" y="12" width="9" height="16" rx="1"/>
+    <rect x="51" y="12" width="9" height="16" rx="1"/>
+    <rect x="4" y="36" width="9" height="16" rx="1"/>
+    <rect x="15" y="36" width="9" height="16" rx="1"/>
+    <rect x="40" y="36" width="9" height="16" rx="1"/>
+    <rect x="51" y="36" width="9" height="16" rx="1"/>
+  </g>
+  <!-- módulos pressurizados -->
+  <rect x="27" y="22" width="10" height="20" rx="3" fill="#f2f4f7" stroke="#0b1d3a" stroke-width="1.2"/>
+  <rect x="24" y="28" width="16" height="8" rx="2" fill="#e3e8ef" stroke="#0b1d3a" stroke-width="1.2"/>
+</svg>

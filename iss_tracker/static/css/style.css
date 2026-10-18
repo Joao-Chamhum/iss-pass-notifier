@@ -1,0 +1,52 @@
+/* ISS Pass Notifier — estilos complementares ao Bootstrap 5 */
+
+:root {
+  --space: #0b1d3a;
+  --space-2: #13315c;
+  --track-future: #0d6efd;
+  --track-past: #8a94a6;
+}
+
+body { background: #f4f6fa; }
+
+.bg-space { background: linear-gradient(90deg, var(--space), var(--space-2)); }
+
+.card { border: 0; border-radius: .75rem; }
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid #e9edf3;
+  font-weight: 600;
+  border-radius: .75rem .75rem 0 0 !important;
+}
+.card-header .bi { color: var(--space-2); margin-right: .25rem; }
+
+#map { height: 440px; border-radius: 0; }
+@media (max-width: 991.98px) { #map { height: 340px; } }
+
+.stat-label { font-size: .75rem; text-transform: uppercase; color: #6c757d; letter-spacing: .03em; }
+.stat-value { font-size: 1.35rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.next-pass {
+  background: linear-gradient(90deg, #e8f0ff, #f4f8ff);
+  border-left: 4px solid var(--track-future);
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+}
+.countdown { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--space); }
+
+.chart-box { position: relative; height: 300px; }
+
+.legend-line { display: inline-block; width: 22px; height: 0; vertical-align: middle; border-top: 3px solid; }
+.legend-future { border-color: var(--track-future); }
+.legend-past { border-color: var(--track-past); border-top-style: dashed; }
+.legend-circle {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle;
+  background: rgba(13, 110, 253, .15); border: 1px solid var(--track-future);
+}
+
+.iss-icon { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 2px #fff); }
+.brand-logo { background: #fff; border-radius: 50%; padding: 2px; }
+
+.table td, .table th { white-space: nowrap; }
+#users-body td { white-space: normal; word-break: break-word; }
+.pref-badge { font-weight: 500; }

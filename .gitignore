@@ -1,0 +1,27 @@
+# Segredos e configuração local
+.env
+.env.*
+!.env.example
+
+# Banco de dados e caches locais
+instance/
+*.db
+*.sqlite3
+iss_tle.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# IDEs / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

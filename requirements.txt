@@ -1,0 +1,10 @@
+# Back-end
+Flask>=3.0,<4.0
+requests>=2.31
+APScheduler>=3.10,<4.0
+skyfield>=1.48          # previsão orbital (SGP4) a partir do TLE
+python-dotenv>=1.0
+tzdata>=2024.1          # base de fusos horários (necessária no Windows)
+
+# Testes
+pytest>=8.0

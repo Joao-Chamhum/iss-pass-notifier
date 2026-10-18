@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ===================== Linha 1: mapa + posição ao vivo ===================== -->
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-globe-americas"></i> Posição da ISS em tempo real</span>
+        <div class="form-check form-switch mb-0 small">
+          <input class="form-check-input" type="checkbox" id="follow-iss" checked>
+          <label class="form-check-label" for="follow-iss">Seguir a ISS</label>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div id="map" role="region" aria-label="Mapa com a posição da ISS"></div>
+      </div>
+      <div class="card-footer small text-secondary">
+        <span class="legend-line legend-future"></span> próximos 90 min
+        <span class="legend-line legend-past ms-3"></span> últimos 45 min
+        <span class="legend-circle ms-3"></span> área de visibilidade (elevação ≥ 10°)
+        <span class="ms-3"><i class="bi bi-hand-index"></i> clique no mapa para escolher sua localização</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4 d-flex flex-column gap-4">
+    <div class="card shadow-sm">
+      <div class="card-header"><i class="bi bi-broadcast"></i> Telemetria</div>
+      <div class="card-body">
+        <div class="row g-3 text-center">
+          <div class="col-6"><div class="stat-label">Latitude</div><div class="stat-value" id="iss-lat">—</div></div>
+          <div class="col-6"><div class="stat-label">Longitude</div><div class="stat-value" id="iss-lon">—</div></div>
+          <div class="col-6"><div class="stat-label">Altitude</div><div class="stat-value" id="iss-alt">—</div></div>
+          <div class="col-6"><div class="stat-label">Velocidade</div><div class="stat-value" id="iss-vel">—</div></div>
+        </div>
+        <div class="small text-secondary mt-3">
+          Fonte: <span id="iss-source">—</span> · atualizado <span id="iss-updated">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header"><i class="bi bi-eye"></i> Agora, na sua localização</div>
+      <div class="card-body">
+        <p class="small text-secondary mb-2">
+          Regra do curso: a ISS está a até ±5° da sua latitude/longitude <b>e</b> é noite?
+        </p>
+        <ul class="list-unstyled mb-0" id="overhead-box">
+          <li><i class="bi bi-dash-circle text-secondary"></i> Selecione uma localização.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Linha 2: localização + passagens ===================== -->
+<div class="row g-4 mt-1">
+  <div class="col-lg-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header"><i class="bi bi-geo-alt"></i> Sua localização</div>
+      <div class="card-body">
+        <form id="location-form" novalidate>
+          <div class="row g-2">
+            <div class="col-6">
+              <label for="lat" class="form-label small">Latitude</label>
+              <input type="number" step="any" min="-90" max="90" class="form-control" id="lat" required placeholder="-23.5505">
+            </div>
+            <div class="col-6">
+              <label for="lon" class="form-label small">Longitude</label>
+              <input type="number" step="any" min="-180" max="180" class="form-control" id="lon" required placeholder="-46.6333">
+            </div>
+            <div class="col-6">
+              <label for="days" class="form-label small">Período</label>
+              <select class="form-select" id="days">
+                <option value="1">24 horas</option>
+                <option value="3" selected>3 dias</option>
+                <option value="5">5 dias</option>
+                <option value="10">10 dias</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="min-el" class="form-label small">Elevação mínima</label>
+              <div class="input-group">
+                <input type="number" min="0" max="80" class="form-control" id="min-el" value="{{ default_min_elevation }}">
+                <span class="input-group-text">°</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-grid gap-2 mt-3">
+            <button type="button" class="btn btn-outline-secondary" id="btn-geolocate">
+              <i class="bi bi-crosshair"></i> Usar minha localização
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-search"></i> Calcular passagens
+            </button>
+          </div>
+        </form>
+        <div class="mt-3 small">
+          <span class="text-secondary">Atalhos:</span>
+          <button class="btn btn-link btn-sm p-0 ms-1 preset" data-lat="-23.5505" data-lon="-46.6333">São Paulo</button> ·
+          <button class="btn btn-link btn-sm p-0 preset" data-lat="-23.1896" data-lon="-45.8841">S. J. dos Campos</button> ·
+          <button class="btn btn-link btn-sm p-0 preset" data-lat="-15.7939" data-lon="-47.8828">Brasília</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span><i class="bi bi-calendar-event"></i> Próximas passagens</span>
+        <div class="d-flex flex-wrap gap-2 small">
+          <span class="badge text-bg-primary" id="pass-count">0 passagens</span>
+          <span class="badge text-bg-success" id="pass-visible">0 visíveis</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="next-pass mb-3 d-none" id="next-pass">
+          <div class="small text-uppercase text-secondary">Próxima passagem começa em</div>
+          <div class="countdown" id="countdown">—</div>
+          <div class="small" id="next-pass-detail"></div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Data</th><th>Início</th><th>Ponto alto</th><th>Fim</th>
+                <th class="text-end">Elev. máx.</th><th class="text-end">Duração</th>
+                <th>Direção</th><th>Visível?</th>
+              </tr>
+            </thead>
+            <tbody id="passes-body">
+              <tr><td colspan="8" class="text-center text-secondary py-4">
+                Informe sua localização e clique em <b>Calcular passagens</b>.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small text-secondary mt-2 mb-0">
+          Horários no fuso do seu navegador (<span id="browser-tz"></span>). “Visível” = céu escuro
+          (Sol abaixo de −6°) e ISS iluminada pelo Sol.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Linha 3: gráficos ===================== -->
+<div class="row g-4 mt-1">
+  <div class="col-lg-7">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-bar-chart"></i> Frequência de passagens por local (próximos 7 dias)</span>
+        <button class="btn btn-sm btn-outline-secondary" id="btn-freq"><i class="bi bi-arrow-clockwise"></i></button>
+      </div>
+      <div class="card-body"><div class="chart-box"><canvas id="freq-chart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header"><i class="bi bi-graph-up"></i> Elevação máxima das próximas passagens</div>
+      <div class="card-body"><div class="chart-box"><canvas id="elev-chart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Linha 4: cadastro e notificações ===================== -->
+<div class="row g-4 mt-1">
+  <div class="col-lg-5">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header"><i class="bi bi-bell"></i> Cadastrar alerta por e-mail</div>
+      <div class="card-body">
+        <form id="user-form" novalidate>
+          <div class="mb-2">
+            <label for="u-name" class="form-label small">Nome</label>
+            <input class="form-control" id="u-name" required maxlength="80" placeholder="Seu nome">
+          </div>
+          <div class="mb-2">
+            <label for="u-email" class="form-label small">E-mail para notificação</label>
+            <input type="email" class="form-control" id="u-email" value="{{ default_email }}" required>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label for="u-lead" class="form-label small">Avisar com antecedência</label>
+              <div class="input-group">
+                <input type="number" min="1" max="180" class="form-control" id="u-lead" value="{{ default_lead_minutes }}">
+                <span class="input-group-text">min</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <label for="u-tz" class="form-label small">Fuso horário</label>
+              <input class="form-control" id="u-tz" value="{{ default_timezone }}">
+            </div>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="u-dark" checked>
+            <label class="form-check-label small" for="u-dark">Apenas passagens visíveis a olho nu</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="u-passes" checked>
+            <label class="form-check-label small" for="u-passes">Aviso antecipado (previsão orbital)</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="u-overhead" checked>
+            <label class="form-check-label small" for="u-overhead">Aviso “Look Up 👆” (regra do curso: ±5° e noite)</label>
+          </div>
+          <p class="small text-secondary">A localização usada é a do formulário “Sua localização”.</p>
+          <div class="d-grid">
+            <button class="btn btn-success" type="submit"><i class="bi bi-person-plus"></i> Cadastrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span><i class="bi bi-people"></i> Usuários cadastrados</span>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary" id="btn-test-email">
+            <i class="bi bi-envelope-check"></i> E-mail de teste
+          </button>
+          <button class="btn btn-sm btn-outline-dark" id="btn-check">
+            <i class="bi bi-play-circle"></i> Verificar agora
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Local</th><th>Preferências</th><th></th></tr></thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+        <h6 class="mt-3"><i class="bi bi-clock-history"></i> Últimas notificações</h6>
+        <ul class="list-group list-group-flush small" id="notif-list"></ul>
+        <p class="small text-secondary mt-2 mb-0">
+          A verificação automática roda a cada {{ check_interval }} minutos
+          (próxima: <span id="next-check">—</span>).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.ISS_CONFIG = {
+    defaultEmail: {{ default_email | tojson }},
+    checkInterval: {{ check_interval | tojson }},
+    issIcon: {{ url_for('static', filename='img/iss.svg') | tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

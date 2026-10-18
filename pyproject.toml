@@ -1,0 +1,13 @@
+[project]
+name = "iss-pass-notifier"
+version = "1.0.0"
+description = "Aplicação Flask que notifica por e-mail as passagens da ISS sobre a localização do usuário."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
