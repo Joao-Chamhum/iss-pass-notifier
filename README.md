@@ -49,7 +49,7 @@ Dois tipos de notificação:
 2. **Look Up 👆:** a regra original do curso. O e-mail sai quando a ISS está a ±5° da sua posição
    e é noite.
 
-Por padrão, as notificações vão para **joaopedrochamhum@gmail.com** (configurável em `NOTIFY_EMAIL`).
+Por padrão, as notificações vão para **seu_nome@gmail.com** (configurável em `NOTIFY_EMAIL`).
 
 ---
 
@@ -128,7 +128,7 @@ Passo a passo manual:
 
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/<seu-usuario>/iss-pass-notifier.git
+git clone https://github.com/Joao-Chamhum/iss-pass-notifier.git
 cd iss-pass-notifier
 
 # 2. Criar e ativar um ambiente virtual
@@ -164,7 +164,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=seu_email_remetente@gmail.com
 SMTP_PASSWORD=xxxx xxxx xxxx xxxx      # senha de app (não é a senha da conta)
-NOTIFY_EMAIL=joaopedrochamhum@gmail.com
+NOTIFY_EMAIL=seu_nome@gmail.com
 ```
 
 4. Teste a configuração:
@@ -183,7 +183,7 @@ ou clique em **"E-mail de teste"** no dashboard.
 |---|---|---|
 | `SMTP_HOST` / `SMTP_PORT` | `smtp.gmail.com` / `587` | Servidor SMTP |
 | `SMTP_USER` / `SMTP_PASSWORD` | — | Credenciais do remetente (**obrigatórias** para enviar) |
-| `NOTIFY_EMAIL` | `joaopedrochamhum@gmail.com` | Destinatário padrão das notificações |
+| `NOTIFY_EMAIL` | `seu_nome@gmail.com` | Destinatário padrão das notificações |
 | `EMAIL_DRY_RUN` | `false` | `true` = só registra no log |
 | `SCHEDULER_ENABLED` | `true` | Liga/desliga a verificação automática |
 | `CHECK_INTERVAL_MINUTES` | `10` | Intervalo da verificação periódica |
